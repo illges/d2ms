@@ -16,7 +16,7 @@ function trig.new()
 	self.toggle_conduct_pattern = false
 	self.toggle_conduct_patch = false
 	self.toggle_conduct_scene = false
-	self.toggle_reset_on_adv = false
+	--self.toggle_reset_on_adv = false
 	return self
 end
 
@@ -25,7 +25,7 @@ function trig:draw_grid(layer, momentary)
 	g:led(10, 5, basic_lighting(layer.conduct_patch == 1))
 	g:led(11, 5, basic_lighting(layer.conduct_scene == 1))
 
-	g:led(11, 6, basic_lighting(self.toggle_reset_on_adv or layer.reset_on_adv == 1))
+	--g:led(11, 6, basic_lighting(self.toggle_reset_on_adv or layer.reset_on_adv == 1))
     g:led(10, 7, basic_lighting(self.group_advance_pressed or layer.group_advance == 1))
 	g:led(10, 8, basic_lighting(self.option_prev))
     g:led(11, 8, basic_lighting(self.option_next))
@@ -51,14 +51,14 @@ function trig:grid_key(layer, momentary)
     self.option_prev = momentary[10][8] == 1 and true or false
 	self.option_next = momentary[11][8] == 1 and true or false
 	self.group_advance_pressed = momentary[10][7] == 1 and true or false
-	self.toggle_reset_on_adv = momentary[11][6] == 1 and true or false
+	--self.toggle_reset_on_adv = momentary[11][6] == 1 and true or false
 	if self.group_advance_pressed then layer:invert_group_advance() end
 	if self.option_prev then layer:set_pattern_num(-1) end
 	if self.option_next then layer:set_pattern_num(1) end
 	if self.toggle_conduct_pattern then layer:invert_conduct_pattern() end
 	if self.toggle_conduct_patch then layer:invert_conduct_patch() end
 	if self.toggle_conduct_scene then layer:invert_conduct_scene() end
-	if self.toggle_reset_on_adv then layer:invert_reset_on_adv() end
+	--if self.toggle_reset_on_adv then layer:invert_reset_on_adv() end
 end
 
 function trig:process(event)
@@ -103,12 +103,12 @@ function trig:process(event)
 		end
 	end
 
-	if (event.layer.conduct_pattern == 1 or
-	   event.layer.conduct_patch == 1 or
-	   event.layer.conduct_scene == 1) and
-	   event.layer.reset_on_adv == 1 then
-		reset_most()
-	end
+	-- if (event.layer.conduct_pattern == 1 or
+	--    event.layer.conduct_patch == 1 or
+	--    event.layer.conduct_scene == 1) and
+	--    event.layer.reset_on_adv == 1 then
+	-- 	reset_most()
+	-- end
 end
 
 function trig:get_current_gesture()
@@ -116,7 +116,7 @@ function trig:get_current_gesture()
     if self.toggle_conduct_pattern then gesture = "pattern"
     elseif self.toggle_conduct_patch then gesture = "patch"
     elseif self.toggle_conduct_scene then gesture = "scene"
-	elseif self.toggle_reset_on_adv then gesture = "reset on adv"
+	--elseif self.toggle_reset_on_adv then gesture = "reset on adv"
 	end
 	return gesture
 end

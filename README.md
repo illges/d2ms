@@ -741,6 +741,9 @@ under PARAMETERS>config in the norns params menu there are some options and togg
 # changelog <a name="changelog"></a>
 
 ---
+### v1.0.1
+- remove reset on adv function from conductor trig until it is more developed
+---
 ### v1.0.0
 - deploy major version 1
 ---

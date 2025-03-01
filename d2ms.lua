@@ -2,7 +2,7 @@
 -- sampler, sequence,
 -- sound, something
 --
--- v1.0.0
+-- v1.0.1
 --
 -- an augmented drumming script
 --
