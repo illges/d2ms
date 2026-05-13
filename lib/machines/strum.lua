@@ -20,7 +20,6 @@ function machine.new()
     self.interval_increase = false
     self.interval_decrease_7 = false
     self.interval_increase_7 = false
-	self.cc_match_pressed = false
     self.continue_strum_pressed = false
     self.mute_strum_pressed = false
 	return self
@@ -33,9 +32,8 @@ function machine:draw_grid(layer, momentary)
 	--         g:led(9, 5, basic_lighting(self.riff_pointer_pressed))
 	--     end
 
-	g:led(10, 5, negative_lighting(layer.cc_match == 1))
+	g:led(10, 5, negative_lighting(layer.mute_strum == 1))
 	g:led(11, 5, negative_lighting(layer.continue_strum == 1))
-	g:led(12, 5, negative_lighting(layer.mute_strum == 1))
 	g:led(10, 6, basic_lighting(self.meta_option_1_decrease))
 	g:led(11, 6, basic_lighting(self.meta_option_1_increase))
 	g:led(9, 6, negative_high_lighting(self.meta_option_1_decrease_half))
@@ -94,11 +92,9 @@ function machine:grid_key(layer, momentary)
 	if self.meta_option_2_decrease_half then layer:set_strum_length("h") end
 	if self.meta_option_2_increase_double then layer:set_strum_length("d") end
 
-	self.cc_match_pressed = momentary[10][5] == 1 and true or false
-	if self.cc_match_pressed then layer:invert_cc_match() end
 	self.continue_strum_pressed = momentary[11][5] == 1 and true or false
 	if self.continue_strum_pressed then layer:invert_continue_strum() end
-	self.mute_strum_pressed = momentary[12][5] == 1 and true or false
+	self.mute_strum_pressed = momentary[10][5] == 1 and true or false
 	if self.mute_strum_pressed then layer:invert_mute_strum() end
 end
 
@@ -106,7 +102,6 @@ function machine:get_current_gesture()
 	local gesture
     if self.interval_decrease or self.interval_increase or self.interval_decrease_7 or self.interval_increase_7 then
 		gesture = "+/- interval"
-	elseif self.cc_match_pressed then gesture = "cc match"
     elseif self.continue_strum_pressed then gesture = "continue strum"
     elseif self.mute_strum_pressed then gesture = "block re-strum"
 	end
@@ -139,13 +134,13 @@ function machine:process(event)
 			clock.cancel(notes_context.lane[routing[i]].strum_clock_id)
 			notes_context.lane[routing[i]]:set_position(position)
 			notes_context.lane[routing[i]]:set_pattern(pattern)
-			if event.layer.cc_send==1 and event.layer.cc_match==1 then
+			if event.layer.cc_send==1 then
 				local cc_position = 1
 				for j=1,#event.channels do
 					local channel = cc_context.channel[event.channels[j]]
 					for k=1,16 do
 						local slot = channel.lane[k]
-						if slot.active == 1 then
+						if slot.active == 1 and slot.strum == 1 then
 							cc_position = event.layer.continue_strum == 1 and slot.strum_position or slot.position
 							slot:set_position(cc_position)
 						end
@@ -186,13 +181,13 @@ function machine:process_v2(event)
 			clock.cancel(notes_context.lane[routing[i]].strum_clock_id)
 			notes_context.lane[routing[i]]:set_position(position)
 			notes_context.lane[routing[i]]:set_pattern(pattern)
-			if event.layer.cc_send==1 and event.layer.cc_match==1 then
+			if event.layer.cc_send==1 then
 				local cc_position = 1
 				for j=1,#event.channels do
 					local channel = cc_context.channel[event.channels[j]]
 					for k=1,16 do
 						local slot = channel.lane[k]
-						if slot.active == 1 then
+						if slot.active == 1 and slot.strum == 1 then
 							cc_position = event.layer.continue_strum == 1 and slot.strum_position or slot.position
 							slot:set_position(cc_position)
 						end

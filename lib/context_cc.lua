@@ -19,6 +19,7 @@ function context.new()
     self.cc_num_dec = false
     self.velocity_mode_pressed = false
     self.hide_position_pressed = false
+    self.strum_pressed = false
     self.engine_active_pressed = false
 
     self.fill_low = false
@@ -218,6 +219,7 @@ function context:grid_key(x,y,on)
 
     if self.velocity_mode_pressed then self.channel[self.sel_channel].lane[self.focus]:set_velocity_mode() end
     if self.hide_position_pressed then self.channel[self.sel_channel].lane[self.focus]:set_hide_position() end
+    if self.strum_pressed then self.channel[self.sel_channel].lane[self.focus]:set_strum() end
 
     local track = self.channel[self.sel_channel].lane[self.focus]
     self.octave_down = self.momentary[1][7] == 1 and true or false
@@ -271,6 +273,7 @@ function context:gesture_indicators()
     self.velocity_mode_pressed = self.momentary[11][5] == 1 and true or false
     self.hide_position_pressed = self.momentary[12][5] == 1 and true or false
     self.engine_active_pressed = self.momentary[3][6] == 1 and true or false
+    self.strum_pressed = self.momentary[3][7] == 1 and true or false
 
     if self.audition and self.shift then self.focus_x = self.channel[self.sel_channel].lane[self.focus]:nudge_pattern(-1) end
     if self.advance_sequence and self.shift then self.focus_x = self.channel[self.sel_channel].lane[self.focus]:nudge_pattern(1) end
@@ -301,6 +304,7 @@ function context:draw_grid()
     g:led(3, 6, negative_high_lighting(self.channel[self.sel_channel].engine_active == 1))
     g:led(1, 7, basic_lighting(self.octave_down))
     g:led(2, 7, basic_lighting(self.octave_up))
+    g:led(3, 7, negative_lighting(self.channel[self.sel_channel].lane[self.focus].strum == 1))
 end
 
 function context:draw_grid_main()
@@ -521,6 +525,7 @@ function context:get_current_gesture()
     elseif self.cc_num_dec then gesture = "cc num dec"
     elseif self.cc_num_inc then gesture = "cc num inc"
     elseif self.engine_active_pressed then gesture = "engine mod active"
+    elseif self.strum_pressed then gesture = "strum match"
     else gesture = self:get_current_gesture_automation()
     end
     self.gesture = gesture

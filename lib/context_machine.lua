@@ -124,6 +124,18 @@ function context:enc_three(d)
     end
 end
 
+function context:set_ui_input()
+    self.selected_ui = util.wrap(self.selected_ui + 1, 1, 2)
+end
+
+function context:set_ui_layer()
+    self.selected_ui = util.wrap(self.selected_ui + 1, 3, 8)
+end
+
+function context:set_ui_sustain()
+    self.selected_ui = 8
+end
+
 function context:check_input_held()
     for i=1,2 do
         for j=1,8 do
@@ -328,6 +340,7 @@ function context:grid_key(x,y,on)
             if self.input[selected].momentary then
                 self.selected_input = selected
                 self:set_layer_visual(self.selected_input)
+                --self:set_ui_input()
             end
             self.input[self.selected_input].sel_machine_layer = sel -- set selected layer same as previous
         end
@@ -366,6 +379,7 @@ function context:grid_key(x,y,on)
             self:copy_velocity(sel, input_machine)
         end
         input_machine.sel_machine_layer = sel
+        --self:set_ui_layer()
     end
 
     if self.midi_learn and input_machine.machine[1].momentary then
@@ -428,7 +442,10 @@ function context:grid_key(x,y,on)
     self.leader_pointer_pressed = self.momentary[8][5] == 1 and true or false
 
     self.hold_time_set = self.momentary[6][5] == 1 and true or false
-    if self.hold_time_set then input_machine.machine[layer]:set_hold_toggle() end
+    if self.hold_time_set then
+        input_machine.machine[layer]:set_hold_toggle()
+        self:set_ui_sustain()
+    end
 
     self.tap_tempo_pressed = self.momentary[16][8] == 1 and true or false
 

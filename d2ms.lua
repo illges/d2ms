@@ -2,14 +2,14 @@
 -- sampler, sequence,
 -- sound, something
 --
--- v1.0.1
+-- v1.1.0
 --
 -- an augmented drumming script
 --
 -- developed by phillwilson
 --           and illges
 
----@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable: undefined-global, lowercase-global, duplicate-set-field
 
 engine.name = 'PolyPerc'
 music = require 'musicutil'
@@ -502,16 +502,12 @@ function strum(event, strum_lane, riff)
     end
     local strum_track = notes_context.lane[strum_lane]
     local cc_send = event.layer.cc_send == 1
-    local cc_match = event.layer.cc_match == 1
     local note_send = event.layer.notes_send == 1
     strum_track.strum_active = 1
-    if cc_send and cc_match == false then
-        route_cc(event)
-    end
     local position = event.offset == 1 and track.prev_position or track.position
     for i=1,event.layer.strum_length do
-        if cc_send and cc_match then
-            route_cc_match(event, i)
+        if cc_send then
+            route_cc_v2(event, i)
         end
         if note_send then
             if riff then
@@ -540,18 +536,8 @@ function strum(event, strum_lane, riff)
             strum_track.prime_ab = false
         end
     end
-    if cc_send and cc_match then
-        for j=1,#event.channels do
-            local channel = cc_context.channel[event.channels[j]]
-            for i=1,16 do
-                local slot = channel.lane[i]
-                if slot.active == 1 then
-                    slot:set_position(slot.strum_position)
-                    slot.strum_light=0
-                    slot.strum_active = 0
-                end
-            end
-        end
+    if cc_send then
+        sync_cc_strum(event)
     end
     clock.cancel(strum_track.strum_clock_id)
     screen_dirty = true
@@ -565,21 +551,34 @@ end
 function ratchet(event)
     local track = notes_context.lane[event.lane]
     local cc_send = event.layer.cc_send == 1
-    local cc_match = event.layer.cc_match == 1
-    if cc_send and cc_match == false then
-        route_cc(event)
-    end
     for i=1,event.layer.strum_length do
-        if cc_send and cc_match then
-            route_cc(event)
+        if cc_send then
+            route_cc_v2(event, i)
         end
         proto_harvest(track, event, true, false)
         grid_dirty = true
         local division = event.layer.strum_division
         if  division > 0 then clock.sleep(clock.get_beat_sec()/division*4) end
     end
+    if cc_send then
+        sync_cc_strum(event)
+    end
     notes_context:set_note_visual(event.lane, track.position)
     advance_lane_position(track,event.lane)
+end
+
+function sync_cc_strum(event)
+    for j=1,#event.channels do
+        local channel = cc_context.channel[event.channels[j]]
+        for i=1,16 do
+            local slot = channel.lane[i]
+            if slot.active == 1 and slot.strum == 1 then
+                slot:set_position(slot.strum_position)
+                slot.strum_light=0
+                slot.strum_active = 0
+            end
+        end
+    end
 end
 
 function chord(row, event, length, division, pos)
@@ -877,6 +876,33 @@ function route_cc(event)
     end
 end
 
+function route_cc_v2(event, count)
+    if count == nil then count = 1 end
+    for j=1,#event.channels do
+        local channel = cc_context.channel[event.channels[j]]
+        if count==1 then cc_context:set_channel_visual(channel.channel) end
+        for i=1,16 do
+            local slot = channel.lane[i]
+            if slot.active == 1 then
+                if slot.strum == 1 then
+                    --print("ch "..j.." lane: "..i)
+                    slot.strum_active = 1
+                    update_midi_cc(channel, i)
+                    update_engine_cc(channel, i)
+                    slot:adv_strum_position()
+                elseif count == 1 then
+                    if slot.velocity_mode == 1 then
+                        harvest_cc_velocity(channel, i, event.channels[j], event)
+                    else
+                        update_engine_cc(channel, i)
+                        harvest_cc(channel, i)
+                    end
+                end
+            end
+        end
+    end
+end
+
 function update_engine_cc(channel, slot)
     if channel.engine_active==0 or slot>4 then return end
     local position = channel.lane[slot].strum_active==1 and channel.lane[slot].strum_position or channel.lane[slot].position
@@ -885,22 +911,6 @@ function update_engine_cc(channel, slot)
     elseif slot==2 then set_release(val)
     elseif slot==3 then set_pan(val)
     elseif slot==4 then set_pw(val)
-    end
-end
-
-function route_cc_match(event, count)
-    for j=1,#event.channels do
-        local channel = cc_context.channel[event.channels[j]]
-        if count==1 then cc_context:set_channel_visual(channel.channel) end
-        for i=1,16 do
-            local slot = channel.lane[i]
-            if slot.active == 1 then
-                slot.strum_active = 1
-                update_midi_cc(channel, i)
-                update_engine_cc(channel, i)
-                slot:adv_strum_position()
-            end
-        end
     end
 end
 

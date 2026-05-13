@@ -91,6 +91,9 @@ function trig:process(event)
 				end
 			end
 		end
+	elseif option == "tap tempo" then
+		trig_context.transport.tap_tempo_set = 0
+		trig_context.transport.clear_tempo_table()
 	else
 		if option == "note" then
 			notes_context.lane[event.lane]:set_position(notes_context.lane[event.lane]:range_min())

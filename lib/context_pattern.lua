@@ -221,14 +221,22 @@ function context_pattern:grid_patching(x,y,z)
 end
 
 function context_pattern:copy_lane(x,y)
-    for key,value in pairs(self.note_lane[y].pattern[x].data) do
-        self.copy_buffer[key] = value
+    -- for key,value in pairs(self.note_lane[y].pattern[x].data) do
+    --     self.copy_buffer[key] = value
+    -- end
+    self.copy_length_buffer_min = self.note_lane[y].b_section == 0 and self.note_lane[y].pattern[x].range.minA or self.note_lane[y].pattern[x].range.minB
+    self.copy_length_buffer_max = self.note_lane[y].b_section == 0 and self.note_lane[y].pattern[x].range.maxA or self.note_lane[y].pattern[x].range.maxB
+    for i=1,16 do
+        self.copy_buffer[i] = self.note_lane[y].pattern[x].data[i]
+        self.copy_mute_buffer[i] = self.note_lane[y].pattern[x].step_mute[i]
     end
 end
 
 function context_pattern:paste_lane(x,y)
+    self.note_lane[y].pattern[x]:set_range_data(self.copy_length_buffer_min,self.copy_length_buffer_max, self.note_lane[y].b_section == 0 and 'A' or 'B')
     for i=1,16 do
         notes_context.lane[y].pattern[x]:set_step_data(i, self.copy_buffer[i])
+        notes_context.lane[y].pattern[x]:set_step_mute(i, self.copy_mute_buffer[i])
     end
 end
 

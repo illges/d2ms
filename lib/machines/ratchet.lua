@@ -19,14 +19,12 @@ function machine.new()
     self.interval_increase = false
     self.interval_decrease_7 = false
     self.interval_increase_7 = false
-	self.cc_match_pressed = false
     self.continue_strum_pressed = false
     self.mute_strum_pressed = false
 	return self
 end
 
-function machine:draw_grid(layer, momentary)
-    g:led(10, 5, negative_lighting(layer.cc_match == 1))
+function machine:draw_grid(layer, momentary)    
 	g:led(11, 5, negative_lighting(layer.continue_strum == 1))
 	g:led(12, 5, negative_lighting(layer.mute_strum == 1))
 	g:led(10, 6, basic_lighting(self.meta_option_1_decrease))
@@ -73,8 +71,6 @@ function machine:grid_key(layer, momentary)
 	if self.meta_option_2_decrease_half then layer:set_strum_length("h") end
 	if self.meta_option_2_increase_double then layer:set_strum_length("d") end
 
-	self.cc_match_pressed = momentary[10][5] == 1 and true or false
-	if self.cc_match_pressed then layer:invert_cc_match() end
 	-- self.continue_strum_pressed = momentary[11][5] == 1 and true or false
 	-- if self.continue_strum_pressed then layer:invert_continue_strum() end
 	-- self.mute_strum_pressed = momentary[12][5] == 1 and true or false
@@ -97,7 +93,6 @@ function machine:get_current_gesture()
     local gesture
     if self.interval_decrease or self.interval_increase or self.interval_decrease_7 or self.interval_increase_7 then
 		gesture = "+/- interval"
-	elseif self.cc_match_pressed then gesture = "cc match"
     -- elseif self.continue_strum_pressed then gesture = "continue strum"
     -- elseif self.mute_strum_pressed then gesture = "mute strum"
 	end

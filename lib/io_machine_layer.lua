@@ -39,7 +39,6 @@ function layer.new(input, id)
     self.chord_vel_density = 0
     self.notes_send = 1
     self.cc_send = 0
-    self.cc_match = 1
     self.continue_strum = 0
     self.mute_strum = 0
     self.strum_length = 8
@@ -132,7 +131,7 @@ function layer:add_params()
 end
 
 function layer:add_params_hidden()
-    params:add_group("input"..self.input.." "..self.layer_type.." vel layer "..self.id, 92)
+    params:add_group("input"..self.input.." "..self.layer_type.." vel layer "..self.id, 91)
     params:add{
         type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_pass_vel"),
         name = ("pass vel"),
@@ -202,13 +201,6 @@ function layer:add_params_hidden()
         min = 0, max = 1,
         default = self.mute_strum,
         action = function(x) self.mute_strum = x end
-    }
-    params:add{
-        type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_cc_match"),
-        name = ("cc match"),
-        min = 0, max = 1,
-        default = self.cc_match,
-        action = function(x) self.cc_match = x end
     }
     params:add{
         type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_follow_offset"),
@@ -415,11 +407,6 @@ end
 function layer:invert_follow_strum()
     local val = self.follow_strum == 0 and 1 or 0
     params:set("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_follow_strum", val)
-end
-
-function layer:invert_cc_match()
-    local val = self.cc_match == 0 and 1 or 0
-    params:set("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_cc_match", val)
 end
 
 function layer:invert_continue_strum()

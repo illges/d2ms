@@ -12,9 +12,10 @@ function automation_lane_cc.new(id, page)
     local self = setmetatable(automation_lane.new(id, page, "cc", "channel_"..page), automation_lane_cc)
     self.active = config[page][id].active and 1 or 0
     self.velocity_mode = config[page][id].velocity and 1 or 0
+    self.strum = 1
     self.hide_position = 0
     self.cc_number = config[page][id].cc_number
-    self.extra_params = 4
+    self.extra_params = 5
     self:add_params()
     return self
 end
@@ -154,6 +155,11 @@ function automation_lane_cc:add_params_main()
                 default = self.hide_position,
                 action = function(x) self.hide_position = x end
     }
+    params:add{ type = "number", id= (self.name.."_lane_"..self.id.."_strum"),
+                name = ("strum"), min = 0, max = 1,
+                default = self.strum,
+                action = function(x) self.strum = x end
+    }
 end
 
 function automation_lane_cc:set_active()
@@ -168,6 +174,11 @@ end
 function automation_lane_cc:set_hide_position()
     local val = self.hide_position == 1 and 0 or 1
     params:set(self.name.."_lane_"..self.id.."_hide_position", val)
+end
+
+function automation_lane_cc:set_strum()
+    local val = self.strum == 1 and 0 or 1
+    params:set(self.name.."_lane_"..self.id.."_strum", val)
 end
 
 function automation_lane_cc:set_velocity_mode()

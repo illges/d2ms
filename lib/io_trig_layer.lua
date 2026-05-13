@@ -25,7 +25,7 @@ function layer.new(input, id, default)
     self.direction_toggle = "reverse"
     self.direction_options = {"reverse", "pingpong", "pingpong2", "random"}
     self.reset_type = "note"
-    self.reset_options = {"note", "cc", "machine", "trig"}--, "filter", "release", "pan", "pw"}
+    self.reset_options = {"note", "cc", "machine", "trig", "tap tempo"}--, "filter", "release", "pan", "pw"}
 
     self.scale_sequence = {1,1,1,1,2,2,2,2}
     self.root_sequence = {0,0,0,0,5,5,5,5}
@@ -47,6 +47,7 @@ function layer.new(input, id, default)
     self.layer_mute = 0
     self.layer_unmute = 0
     self.reset_on_adv = 0
+    self.tap_tempo_one_shot = 0
 
     self.input_machine = {}
     for i=1,16 do
@@ -127,7 +128,7 @@ function layer:any_input_routing_high()
 end
 
 function layer:check_reset_meta()
-    if self.type=="reset" and (self.reset_type=="machine" or self.reset_type=="trig") then return true end
+    if self.type=="reset" and (self.reset_type=="machine" or self.reset_type=="trig" or self.reset_type=="tap tempo") then return true end
     return false
 end
 
@@ -151,13 +152,20 @@ function layer:add_params()
 end
 
 function layer:add_params_hidden()
-    params:add_group("input"..self.input.." "..self.layer_type.." vel layer "..self.id, 101)
+    params:add_group("input"..self.input.." "..self.layer_type.." vel layer "..self.id, 102)
     params:add{
         type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_reset_on_adv"),
         name = ("reset on adv"),
         min = 0, max = 1,
         default = self.reset_on_adv,
         action = function(x) self.reset_on_adv = x end
+    }
+    params:add{
+        type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_tap_tempo_one_shot"),
+        name = ("tap tempo one shot"),
+        min = 0, max = 1,
+        default = self.tap_tempo_one_shot,
+        action = function(x) self.tap_tempo_one_shot = x end
     }
     params:add{
         type = "number", id = ("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_process_clock_division"),
@@ -455,6 +463,11 @@ end
 function layer:invert_reset_on_adv()
     local val = self.reset_on_adv == 0 and 1 or 0
     params:set("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_reset_on_adv", val)
+end
+
+function layer:invert_tap_tempo_one_shot()
+    local val = self.tap_tempo_one_shot == 0 and 1 or 0
+    params:set("input_"..self.input.."_"..self.layer_type.."_layer_"..self.id.."_tap_tempo_one_shot", val)
 end
 
 function layer:invert_delayed_process_reset_mode()

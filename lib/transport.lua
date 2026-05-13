@@ -5,6 +5,7 @@ local transport = {}
 transport.tap_tempo_index = 1
 transport.tap_tempo_table = {}
 transport.tap_tempo_display = {}
+transport.tap_tempo_set = 0
 
 tap = 0
 deltatap = 1
@@ -33,17 +34,20 @@ function transport.tap_tempo()
         local val = util.round(sum_tempo/3,0.1)
         if round_bpm == 1 then val = math.floor(val+0.5) end
         params:set("clock_tempo",val)
+        transport.tap_tempo_set = 1
         tap_tempo_set_counter = 10
         print("clock set to "..params:get("clock_tempo"))
         transport.tap_tempo_table = {}
         transport.tap_tempo_index = 1
         sum_tempo = 0
     elseif #transport.tap_tempo_table == 1 then
+        transport.tap_tempo_set = 0
         transport_clock_id = clock.run(transport.check_input_time_reset_thresh)
         for i=2,4 do
             transport.tap_tempo_display[i] = nil
         end
     elseif #transport.tap_tempo_table > 1 and #transport.tap_tempo_table < 4 then
+        transport.tap_tempo_set = 0
         transport_clock_id = clock.run(transport.check_input_time_reset_thresh)
     end
 end

@@ -741,9 +741,16 @@ under PARAMETERS>config in the norns params menu there are some options and togg
 # changelog <a name="changelog"></a>
 
 ---
-### v1.0.1
-- remove reset on adv function from conductor trig until it is more developed
----
-### v1.0.0
-- deploy major version 1
+### v1.1.0
+- add tap tempo destination to reset trig
+- added one shot mode to tap tempo trig
+    - grid button (11,6)
+    - once its locked it shows '!!!'
+    - press the tap tempo button to unlock
+- cc strum match is per cc lane per channel
+    - defaulted to ON
+    - grid button (3,7)
+- moved block restrum button to (10,5) for strum machine
+- update pattern copy/paste to copy lane mutes and lengths
+- toggling layer sustain time now focuses that param on the norns screen
 ---
