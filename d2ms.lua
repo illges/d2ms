@@ -2,7 +2,7 @@
 -- sampler, sequence,
 -- sound, something
 --
--- v1.1.0
+-- v1.1.1
 --
 -- an augmented drumming script
 --
@@ -67,6 +67,7 @@ TRIGS = {
     proxy = include 'lib/trigs/proxy',
     release = include 'lib/trigs/release',
     conductor = include 'lib/trigs/conductor',
+    flush = include 'lib/trigs/flush',
 }
 
 g = grid.connect()
@@ -357,7 +358,7 @@ g.key = function(x,y,z)
 
     -- midi note_off all
     if current_context.momentary[1][5] == 1 and
-       current_context.momentary[2][5] == 1 then kill_midi_notes() end
+       current_context.momentary[2][5] == 1 then flush_midi_notes() end
 
     grid_dirty = true
     screen_dirty = true
@@ -1054,6 +1055,14 @@ end
 
 function midi_event_note_off(d) end
 
+function midi_event_cc(d)
+    if pass_through_cc == 1 then
+        for j=1,#device_manager.output_devices do
+            device_manager.output_devices[j].midi:cc(d.cc, d.val, d.ch)
+        end
+    end
+end
+
 function midi_event_start(d) end
 
 function midi_event_stop(d)
@@ -1091,8 +1100,6 @@ function reset_most()
     grid_dirty = true
     screen_dirty = true
 end
-
-function midi_event_cc(d) end
 
 function process_midi_event(d)
     dev_map(d)
@@ -1288,7 +1295,7 @@ function dev_map(d)
     end
 end
 
-function kill_midi_notes()
+function flush_midi_notes()
     for i=1,127 do
         for k=1,16 do
             for j=1,#device_manager.output_devices do
@@ -1296,7 +1303,7 @@ function kill_midi_notes()
             end
         end
     end
-    print("kill midi notes")
+    print("flush midi notes")
 end
 
 function log_midi_input(d)

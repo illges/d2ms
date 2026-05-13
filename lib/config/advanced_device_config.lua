@@ -10,6 +10,7 @@ local config = {
     {"LMM2", IN},
     {"mio", OUT},
     {"LMM1", OFF},
+    {"AK3", IN},
 }
 
 return config

@@ -741,6 +741,10 @@ under PARAMETERS>config in the norns params menu there are some options and togg
 # changelog <a name="changelog"></a>
 
 ---
+### v1.1.1
+- add a flush midi trig to send note off on all channels for all notes
+- add a basic cc pass through with toggle under config param section (default to OFF)
+---
 ### v1.1.0
 - add tap tempo destination to reset trig
 - added one shot mode to tap tempo trig

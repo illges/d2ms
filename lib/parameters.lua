@@ -15,7 +15,9 @@ pw_max = 100
 
 function add_main_params()
     params:add_separator("d2ms")
-    params:add_group("config", 19)
+    params:add_group("config", 20)
+    params:add{ type = "number", id= ("pass through cc"), name = ("pass through cc"),
+                min = 0, max = 1, default = config.pass_through_cc, action = function(x) pass_through_cc = x end}
     params:add{
         type = "option", id = ("setup"),
         name = ("setup"),

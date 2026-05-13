@@ -2,6 +2,7 @@
 
 local config = {
     load_default = 1,
+    pass_through_cc = 0,
     round_bpm = 0,
     lock_midi_learn = 0,
     grid_light_pulse = 1,

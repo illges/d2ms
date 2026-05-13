@@ -10,7 +10,7 @@ function layer.new(input, id, default)
     self.input = input
     self.id = id
     self.momentary = false
-    self.trig_types_list = {"EMPTY","AB","proxy","conductor","release","reset","direction","layer_mute","fill","sustain","offset","cc","root","scale","tap_tempo","auto","gears"}
+    self.trig_types_list = {"EMPTY","AB","proxy","conductor","release","reset","direction","layer_mute","fill","sustain","offset","cc","root","scale","tap_tempo","auto","gears", "flush"}
     self.type = "fill"
     self.type_num = default
     self.ui_clamp = 7
